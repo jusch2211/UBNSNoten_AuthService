@@ -1,6 +1,8 @@
 package UBNS.AuthService.AuthService.controller;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,8 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private static final Logger log =
+            LoggerFactory.getLogger(AuthController.class);
 
     public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
@@ -23,16 +27,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
+        
         AppUser user = userService.authenticate(
                 request.username(),
                 request.password()
         );
-
+        log.info("GET /login called: user={}", request.username());
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-
         String token = jwtUtil.generateToken(user);
         return ResponseEntity.ok(new LoginResponse(token));
     }
