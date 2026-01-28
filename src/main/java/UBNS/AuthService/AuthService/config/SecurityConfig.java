@@ -2,6 +2,7 @@ package UBNS.AuthService.AuthService.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,18 +23,25 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+            // REST → keine CSRF
             .csrf(csrf -> csrf.disable())
+            // CORS für Flutter / Web
             .cors(Customizer.withDefaults())
-            .sessionManagement(sm ->
-                sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+            // Stateless → keine Session
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Zugriffskontrolle
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                // OPTIONS freigeben (Preflight)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Login frei
+                .requestMatchers("/login").permitAll()
+                // Alle anderen Endpoints erfordern Auth
                 .anyRequest().authenticated()
             )
+            // JWT-Filter vor UsernamePasswordAuthenticationFilter ausführen
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
