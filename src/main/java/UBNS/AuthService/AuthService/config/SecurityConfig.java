@@ -23,25 +23,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // REST → keine CSRF
             .csrf(csrf -> csrf.disable())
-            // CORS für Flutter / Web
             .cors(Customizer.withDefaults())
-            // Stateless → keine Session
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Zugriffskontrolle
+            .sessionManagement(sm ->
+                sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
-                // OPTIONS freigeben (Preflight)
+                // 🔥 DAS IST DER FIX
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Login frei
-                .requestMatchers("/login").permitAll()
-                // Alle anderen Endpoints erfordern Auth
+
+                // Login-Endpunkt
+                .requestMatchers("/auth/login").permitAll()
+
                 .anyRequest().authenticated()
             )
-            // JWT-Filter vor UsernamePasswordAuthenticationFilter ausführen
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
