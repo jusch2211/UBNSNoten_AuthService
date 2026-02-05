@@ -1,0 +1,42 @@
+# Bytecode / Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtuelle Umgebung
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Distribution / Builds
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Pytest cache
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+
+# Pipenv / Poetry
+Pipfile.lock
+poetry.lock
